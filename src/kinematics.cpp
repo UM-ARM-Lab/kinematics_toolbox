@@ -260,11 +260,11 @@ Eigen::Matrix4d kinematics::expTwist(const Vector6d& xi, double theta)
     return expT;
 }
 
-Eigen::Affine3d kinematics::expTwistAffine3d(const Vector6d& xi, double theta)
+Eigen::Isometry3d kinematics::expTwistIsometry3d(const Vector6d& xi, double theta)
 {
     // TODO: this better
     const Eigen::Matrix4d tmp = expTwist(xi, theta);
-    Eigen::Affine3d expT;
+    Eigen::Isometry3d expT;
     expT = tmp.matrix();
     return expT;
 }
@@ -282,20 +282,20 @@ Eigen::Matrix4d kinematics::expTwist(const std::vector<Vector6d>& xi,
     return g;
 }
 
-Eigen::Affine3d kinematics::expTwistAffine3d(const std::vector<Vector6d>& xi,
+Eigen::Isometry3d kinematics::expTwistIsometry3d(const std::vector<Vector6d>& xi,
                                              const std::vector<double>& theta)
 {
-    Eigen::Affine3d g = Eigen::Affine3d::Identity();
+    Eigen::Isometry3d g = Eigen::Isometry3d::Identity();
 
     for (size_t i = 0; i < theta.size(); i++)
     {
-        g = g * expTwistAffine3d(xi[i], theta[i]);
+        g = g * expTwistIsometry3d(xi[i], theta[i]);
     }
 
     return g;
 }
 
-VectorAffine3d kinematics::applyTwist(const VectorAffine3d& starting_pose,
+VectorIsometry3d kinematics::applyTwist(const VectorIsometry3d& starting_pose,
                                       const VectorVector6d& xi,
                                       std::vector<double> theta)
 {
@@ -308,11 +308,11 @@ VectorAffine3d kinematics::applyTwist(const VectorAffine3d& starting_pose,
     assert(num_poses == xi.size());
     assert(num_poses == theta.size());
 
-    VectorAffine3d result(num_poses);
+    VectorIsometry3d result(num_poses);
     for (size_t pose_ind = 0; pose_ind < num_poses; pose_ind++)
     {
         result[pose_ind] = starting_pose[pose_ind] *
-                expTwistAffine3d(xi[pose_ind], theta[pose_ind]);
+                expTwistIsometry3d(xi[pose_ind], theta[pose_ind]);
     }
 
     return result;
@@ -480,12 +480,12 @@ Eigen::MatrixXd kinematics::dampedPinvXd(const Eigen::MatrixXd& J,
 // Other
 ////////////////////////////////////////////////////////////////////////////////
 
-Vector6d kinematics::calculateError(const Eigen::Affine3d& g_current,
-                                    const Eigen::Affine3d& g_desired)
+Vector6d kinematics::calculateError(const Eigen::Isometry3d& g_current,
+                                    const Eigen::Isometry3d& g_desired)
 {
     Vector6d xi;
 
-    Eigen::Affine3d g_diff = g_current.inverse() * g_desired;
+    Eigen::Isometry3d g_diff = g_current.inverse() * g_desired;
 
     xi = twistUnhat(g_diff.matrix().log());
 
@@ -508,20 +508,20 @@ Vector6d kinematics::calculateError(const Eigen::Matrix4d& g_current,
     return xi;
 }
 
-Vector6d kinematics::calculateVelocity(const Eigen::Affine3d& g_current,
-                                       const Eigen::Affine3d& g_next,
+Vector6d kinematics::calculateVelocity(const Eigen::Isometry3d& g_current,
+                                       const Eigen::Isometry3d& g_next,
                                        const double dt)
 {
     Vector6d xi;
 
-    const Eigen::Affine3d g_diff = g_current.inverse() * g_next;
+    const Eigen::Isometry3d g_diff = g_current.inverse() * g_next;
 
     xi = twistUnhat(g_diff.matrix().log());
 
     return xi/dt;
 }
 
-VectorVector6d kinematics::calculateVelocities(const VectorAffine3d& g_trajectory,
+VectorVector6d kinematics::calculateVelocities(const VectorIsometry3d& g_trajectory,
                                                const double dt)
 {
     assert(g_trajectory.size() >= 2);
@@ -536,7 +536,7 @@ VectorVector6d kinematics::calculateVelocities(const VectorAffine3d& g_trajector
     return xi;
 }
 
-Eigen::VectorXd kinematics::calulateDeltas(const VectorAffine3d& g)
+Eigen::VectorXd kinematics::calulateDeltas(const VectorIsometry3d& g)
 {
     assert(g.size() >= 1);
 

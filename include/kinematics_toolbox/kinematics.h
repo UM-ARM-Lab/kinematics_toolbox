@@ -27,7 +27,7 @@ namespace kinematics
   typedef std::vector<Eigen::Quaternionf, Eigen::aligned_allocator<Eigen::Quaternionf>> VectorQuaternionf;
   typedef std::vector<Eigen::Quaterniond, Eigen::aligned_allocator<Eigen::Quaterniond>> VectorQuaterniond;
   typedef std::vector<Eigen::Affine3f, Eigen::aligned_allocator<Eigen::Affine3f>> VectorAffine3f;
-  typedef std::vector<Eigen::Affine3d, Eigen::aligned_allocator<Eigen::Affine3d>> VectorAffine3d;
+  typedef std::vector<Eigen::Isometry3d, Eigen::aligned_allocator<Eigen::Isometry3d>> VectorIsometry3d;
 
   typedef struct
   {
@@ -74,13 +74,13 @@ namespace kinematics
   Matrix6d adj(const Eigen::Matrix4d& g);
   Eigen::Matrix3d expmExact(const Eigen::Matrix3d& w_hat, const double theta);
   Eigen::Matrix4d expTwist(const Vector6d& xi, double theta);
-  Eigen::Affine3d expTwistAffine3d(const Vector6d& xi, double theta);
+  Eigen::Isometry3d expTwistIsometry3d(const Vector6d& xi, double theta);
   Eigen::Matrix4d expTwist(const std::vector<Vector6d>& xi,
                            const std::vector<double>& theta);
-  Eigen::Affine3d expTwistAffine3d(const std::vector<Vector6d>& xi,
+  Eigen::Isometry3d expTwistIsometry3d(const std::vector<Vector6d>& xi,
                                    const std::vector<double>& theta);
 
-  VectorAffine3d applyTwist(const VectorAffine3d& starting_pose,
+  VectorIsometry3d applyTwist(const VectorIsometry3d& starting_pose,
                             const VectorVector6d& xi,
                             std::vector<double> theta = std::vector<double>(0));
 
@@ -112,20 +112,20 @@ namespace kinematics
   // Other
   ////////////////////////////////////////////////////////////////////////////////
 
-  Vector6d calculateVelocity(const Eigen::Affine3d& g_current,
-                             const Eigen::Affine3d& g_next,
+  Vector6d calculateVelocity(const Eigen::Isometry3d& g_current,
+                             const Eigen::Isometry3d& g_next,
                              const double dt);
 
-  VectorVector6d calculateVelocities(const VectorAffine3d& g_trajectory,
+  VectorVector6d calculateVelocities(const VectorIsometry3d& g_trajectory,
                                      const double dt);
 
-  Vector6d calculateError(const Eigen::Affine3d& g_current,
-                          const Eigen::Affine3d& g_desired);
+  Vector6d calculateError(const Eigen::Isometry3d& g_current,
+                          const Eigen::Isometry3d& g_desired);
 
   Vector6d calculateError(const Eigen::Matrix4d& g_current,
                           const Eigen::Matrix4d& g_desired);
 
-  Eigen::VectorXd calulateDeltas(const VectorAffine3d& g);
+  Eigen::VectorXd calulateDeltas(const VectorIsometry3d& g);
 }
 
 #endif
