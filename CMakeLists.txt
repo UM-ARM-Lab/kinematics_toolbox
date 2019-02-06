@@ -39,8 +39,12 @@ add_definitions("-std=c++0x -O3 -g -flto -Wall -Wextra -Wpedantic -Wconversion -
 ## Build - Libraries ##
 #######################
 
-add_library(${PROJECT_NAME}
+add_custom_target(${PROJECT_NAME}_headers SOURCES
   include/${PROJECT_NAME}/kinematics.h
+  include/${PROJECT_NAME}/kinematics_ros_types.h
+)
+
+add_library(${PROJECT_NAME}
   src/kinematics.cpp
 )
 target_link_libraries(${PROJECT_NAME}
@@ -48,7 +52,6 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 add_library(${PROJECT_NAME}_ros_types
-  include/${PROJECT_NAME}/kinematics_ros_types.h
   src/kinematics_ros_types.cpp
 )
 target_link_libraries(${PROJECT_NAME}_ros_types
